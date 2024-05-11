@@ -29,19 +29,18 @@ def main(pagina):
    chat = ft.Column() # chat é uma coluna
 
    def enviar_mensagem_para_geral(mensagem): 
-      chat.controls.append(ft.Text(mensagem))
+      texto_chat = ft.Text(mensagem)
+      chat.controls.append(texto_chat)
+
       pagina.update()
 
    pagina.pubsub.subscribe(enviar_mensagem_para_geral)
-
 
    def enviar_mensagem(evento):
       texto_mensagem = campo_mensagem.value
       nome_usuario = campo_nome_usuario.value
       mensagem = f"{nome_usuario}: {texto_mensagem}"
       pagina.pubsub.send_all(mensagem) # envia a mensagem para todos os inscritos
-      texto_chat = ft.Text(mensagem)
-      chat.controls.append(texto_chat)
       campo_mensagem.value = ""
       pagina.update()
 
@@ -58,7 +57,9 @@ def main(pagina):
       pagina.add(chat)
       pagina.add(linha_mensagem)
       # append - adicionar no final da lista
-      chat.controls.append(ft.Text(f"{campo_nome_usuario.value} entrou no chat"))
+      mensagem_entrar_chat = f"{campo_nome_usuario.value} entrou no chat"
+      pagina.pubsub.send_all(mensagem_entrar_chat)
+      chat.controls.append()
 
       pagina.update()
 
