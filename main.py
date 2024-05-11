@@ -26,14 +26,43 @@ def main(pagina):
    titulo_janela = ft.Text("Bem-vindo ao ZapZap!")
    campo_nome_usuario = ft.TextField(label="Escreva seu nome no chat")
 
-   def iniciar_chat(evento):
+   chat = ft.Column() # chat é uma coluna
+
+   def enviar_mensagem_para_geral(mensagem): 
+      chat.controls.append(ft.Text(mensagem))
+      pagina.update()
+
+   pagina.pubsub.subscribe(enviar_mensagem_para_geral)
+
+
+   def enviar_mensagem(evento):
+      texto_mensagem = campo_mensagem.value
+      nome_usuario = campo_nome_usuario.value
+      mensagem = f"{nome_usuario}: {texto_mensagem}"
+      pagina.pubsub.send_all(mensagem) # envia a mensagem para todos os inscritos
+      texto_chat = ft.Text(mensagem)
+      chat.controls.append(texto_chat)
+      campo_mensagem.value = ""
+      pagina.update()
+
+   campo_mensagem = ft.TextField(label="Digite sua mensagem", on_submit=enviar_mensagem)
+   botao_enviar_mensagem = ft.ElevatedButton("Enviar", on_click=enviar_mensagem)
+
+   linha_mensagem = ft.Row([campo_mensagem, botao_enviar_mensagem])   
+
+   def entrar_chat(evento):
       pagina.remove(titulo)
       pagina.remove(botao_iniciar)
       janela.open = False
-      
+
+      pagina.add(chat)
+      pagina.add(linha_mensagem)
+      # append - adicionar no final da lista
+      chat.controls.append(ft.Text(f"{campo_nome_usuario.value} entrou no chat"))
+
       pagina.update()
 
-   botao_enviar = ft.ElevatedButton("Entrar no chat", on_click=iniciar_chat)
+   botao_enviar = ft.ElevatedButton("Entrar no chat", on_click=entrar_chat)
    janela = ft.AlertDialog(
       title=titulo_janela, 
       content=campo_nome_usuario, 
